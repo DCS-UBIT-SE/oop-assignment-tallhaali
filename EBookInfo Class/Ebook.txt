@@ -1,0 +1,13 @@
+Title: Calculus Made Easy
+Author: Silvanus P. Thompson
+
+Calculus is the mathematics of change.
+It deals with quantities that vary and the rates at which they vary.
+
+This book introduces the core ideas of differentiation and integration
+in a way that’s meant to be simple and intuitive.
+Each chapter builds upon the previous one, using practical examples
+to show how calculus connects to real-life problems.
+
+Remember: don’t be afraid of symbols—they’re just shorthand for ideas.
+Once you grasp the ideas, the symbols start to make sense too.
