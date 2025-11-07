@@ -1,7 +1,9 @@
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.*;
-            ////////////
+
+////////////
             //OBECTIVE//
             ///////////
             
@@ -28,11 +30,11 @@ import java.net.*;
 public class Server_chat {
 
     public static void main(String[] args) throws Exception {
-        ServerSocket ss =new ServerSocket(9090);
+        ServerSocket ss = new ServerSocket(9090);
         DataInputStream dis;
         DataOutputStream dos;
         System.out.println("Waiting for client");
-        Socket s =ss.accept();
+        Socket s = ss.accept();
         System.out.println("Client connected");
         String msgFromClient;
         String msgFromServer;
@@ -40,19 +42,18 @@ public class Server_chat {
 
         dis = new DataInputStream(s.getInputStream());
         dos = new DataOutputStream(s.getOutputStream());
-        msgFromClient="";
-        while(!msgFromClient.equalsIgnoreCase("bye")){
-        msgFromClient=dis.readUTF();
-        System.out.println("Client said:\n\t"+msgFromClient);
-        if(msgFromClient.equalsIgnoreCase("bye")){
-            dos.writeUTF("bye");
-            System.out.println("Chat ended by the client");
-            break;
+        msgFromClient = "";
+        while (!msgFromClient.equalsIgnoreCase("bye")) {
+            msgFromClient = dis.readUTF();
+            System.out.println("Client said:\n\t" + msgFromClient);
+            if (msgFromClient.equalsIgnoreCase("bye")) {
+                dos.writeUTF("bye");
+                System.out.println("Chat ended by the client");
+                break;
+            }
         }
-    }
 
-
-        msgFromServer="I have received your following message:"+msgFromClient;
+        msgFromServer = "I have received your following message:" + msgFromClient;
         dos.writeUTF(msgFromServer);
         dis.close();
         dos.close();
