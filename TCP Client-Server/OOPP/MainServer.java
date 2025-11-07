@@ -3,6 +3,7 @@ import java.util.Scanner;
 
 
 
+
 public class MainServer {
     public static void main(String[] args) throws Exception{
         
@@ -10,8 +11,7 @@ public class MainServer {
         System.out.print("Enter the port to start the server: ");
         int userPort= userInput.nextInt();
         Connection server =new Connection(userPort);
-        server.clientConnection();
-        server.Chat();
+        server.startServer();
         server.close();
     }
     
