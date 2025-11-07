@@ -1,8 +1,4 @@
-
 import java.util.Scanner;
-
-
-
 
 public class MainServer {
     public static void main(String[] args) throws Exception{
@@ -12,7 +8,6 @@ public class MainServer {
         int userPort= userInput.nextInt();
         Connection server =new Connection(userPort);
         server.startServer();
-        server.close();
     }
     
 }

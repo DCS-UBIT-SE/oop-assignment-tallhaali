@@ -12,26 +12,33 @@ public class Connection {
     }
 
     public void startServer() throws IOException {
-        int clientCount=0;
-        System.out.println("Waiting for client...");
-        while(true){
-        Socket clientSocket = ss.accept();
+    int clientCount = 0;
+    System.out.println("Waiting for client...");
+    while(true){
+       Socket clientSocket = ss.accept();  
         clientCount++;
         System.out.println("Client "+clientCount+" connected.");
+         DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
 
-        ChatHandler handle =new ChatHandler(clientSocket);
-        Thread thread =new Thread(handle);
-        thread.start();
-        }
-    }
+        // Authenticate client
+        Authentication auth = new Authentication();
+        auth.sendKey(clientSocket);
 
-    public void close() throws IOException {
-        if (clientSocket != null) {
-            clientSocket.close();
-        }
-        if (ss != null) {
-            ss.close();
-        }
-        System.out.println("Server closed.");
+        if (!auth.verification(clientSocket)) {
+    
+    dos.writeBoolean(false); // notify client verification failed
+    clientSocket.close();
+    System.out.println("Client authentication failed. Connection closed.");
+    continue; // wait for next client
+} else {
+       dos.writeBoolean(true); // notify client verification successful
+}
+
+    
+        ChatHandler chat = new ChatHandler(clientSocket, clientCount);
+Thread thread = new Thread(chat);
+thread.start();
+
     }
+}
 }
