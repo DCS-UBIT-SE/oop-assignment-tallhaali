@@ -4,7 +4,6 @@ import java.net.*;
 public class Connection {
 
     private ServerSocket ss;
-    private Socket clientSocket;
 
     public Connection(int port) throws IOException {
         ss = new ServerSocket(port);
@@ -12,33 +11,43 @@ public class Connection {
     }
 
     public void startServer() throws IOException {
-    int clientCount = 0;
-    System.out.println("Waiting for client...");
-    while(true){
-       Socket clientSocket = ss.accept();  
-        clientCount++;
-        System.out.println("Client "+clientCount+" connected.");
-         DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
+        int clientCount = 0;
+        System.out.println("Waiting for client...");
 
-        // Authenticate client
-        Authentication auth = new Authentication();
-        auth.sendKey(clientSocket);
+        while (true) {
+            Socket clientSocket = ss.accept();
+            clientCount++;
+            System.out.println("Client " + clientCount + " connected.");
 
-        if (!auth.verification(clientSocket)) {
-    
-    dos.writeBoolean(false); // notify client verification failed
-    clientSocket.close();
-    System.out.println("Client authentication failed. Connection closed.");
-    continue; // wait for next client
-} else {
-       dos.writeBoolean(true); // notify client verification successful
-}
+            DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
+            DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
 
-    
-        ChatHandler chat = new ChatHandler(clientSocket, clientCount);
-Thread thread = new Thread(chat);
-thread.start();
+            
+            Authentication auth = new Authentication();
+            auth.sendKey(dos);
+            if (!auth.verification(dis)) {
+                dos.writeBoolean(false);
+                clientSocket.close();
+                System.out.println("Client " + clientCount + " authentication failed. Connection closed.");
+                continue;
+            }
 
+            dos.writeBoolean(true);
+            System.out.println("Client " + clientCount + " authenticated successfully.");
+
+            
+            String mode = dis.readUTF();
+
+            if (mode.equalsIgnoreCase("chat")) {
+                ChatHandler chat = new ChatHandler(clientSocket, clientCount);
+                new Thread(chat).start();
+            } else if (mode.equalsIgnoreCase("file")) {
+                FileTransferHandler fileHandler = new FileTransferHandler(clientSocket, clientCount);
+                new Thread(fileHandler).start();
+            } else {
+                System.out.println("Invalid mode from Client " + clientCount);
+                clientSocket.close();
+            }
+        }
     }
-}
 }

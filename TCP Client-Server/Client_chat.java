@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -34,8 +35,9 @@ public class Client_chat {
         DataInputStream dis = new DataInputStream(s.getInputStream());
         DataOutputStream dos = new DataOutputStream(s.getOutputStream());
         int encodedKey = dis.readInt();
-        int decodedKey = (encodedKey - 3) << 2;
+        int decodedKey = (encodedKey - 3) /4;
         dos.writeInt(decodedKey);
+         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         boolean verified = dis.readBoolean();
 
         if (!verified) {
@@ -55,36 +57,37 @@ public class Client_chat {
 
         if (choice == 1) {
             dos.writeUTF("chat");
+            System.out.println("Connected to server at port: " + port);
+           
+
+            while (true) {
+                System.out.print("You: ");
+                msgSent = br.readLine();
+                dos.writeUTF(msgSent);
+                dos.flush();
+
+                if (msgSent.equalsIgnoreCase("bye")) {
+                    System.out.println("You ended the chat.");
+                    break;
+                }
+
+                msgFromServer = dis.readUTF();
+                if (msgFromServer.equalsIgnoreCase("bye")) {
+                    System.out.println("Server ended the chat.");
+                    break;
+                }
+
+                System.out.println("Server: " + msgFromServer);
+            }
+
         } else if (choice == 2) {
             dos.writeUTF("file");
+            receiveFiles(dis);
         } else {
             System.out.println("Invalid choice!");
         }
 
-        System.out.println("Connected to server at port: " + port);
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-        while (true) {
-            System.out.print("You: ");
-            msgSent = br.readLine();
-            dos.writeUTF(msgSent);
-            dos.flush();
-
-            if (msgSent.equalsIgnoreCase("bye")) {
-                System.out.println("You ended the chat.");
-                break;
-            }
-
-            msgFromServer = dis.readUTF();
-            if (msgFromServer.equalsIgnoreCase("bye")) {
-                System.out.println("Server ended the chat.");
-                break;
-            }
-
-            System.out.println("Server: " + msgFromServer);
-        }
-
-        br.close();
+        
         s.close();
         dis.close();
         dos.close();
