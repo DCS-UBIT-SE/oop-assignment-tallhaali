@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -8,8 +7,8 @@ import java.net.*;
 import java.util.Scanner;
 
 ////////////
-            //OBECTIVE//
-            ///////////
+//OBJECTIVE//
+////////////
 
 // 1. Create a client program.
 // 2. Connect the client to the server running on the same computer (`localhost`) using port 1000.
@@ -36,20 +35,32 @@ public class Client_chat {
         DataOutputStream dos = new DataOutputStream(s.getOutputStream());
         int encodedKey = dis.readInt();
         int decodedKey = (encodedKey - 3) << 2;
-        dos.writeInt(decodedKey); 
+        dos.writeInt(decodedKey);
         boolean verified = dis.readBoolean();
-if (!verified) {
-    System.out.println("Verification failed. Connection closed by server.");
-    s.close();
-    dis.close();
-    dos.close();
-    sc.close();
-    return;
-}
 
+        if (!verified) {
+            System.out.println("Verification failed. Connection closed by server.");
+            s.close();
+            dis.close();
+            dos.close();
+            sc.close();
+            return;
+        }
+
+        System.out.println("Choose mode:\n1. Chat\n2. File Transfer");
+        int choice = sc.nextInt();
+        sc.nextLine();
         String msgFromServer;
         String msgSent = "";
-       
+
+        if (choice == 1) {
+            dos.writeUTF("chat");
+        } else if (choice == 2) {
+            dos.writeUTF("file");
+        } else {
+            System.out.println("Invalid choice!");
+        }
+
         System.out.println("Connected to server at port: " + port);
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -78,5 +89,13 @@ if (!verified) {
         dis.close();
         dos.close();
         sc.close();
+    }
+
+    private static void receiveFiles(DataInputStream dis) throws IOException {
+        int count = dis.readInt();
+        System.out.println("\nFiles on server:");
+        for (int i = 0; i < count; i++) {
+            System.out.println(" - " + dis.readUTF());
+        }
     }
 }
